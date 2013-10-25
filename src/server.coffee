@@ -96,7 +96,7 @@ deferredApp = ->
               console.log job
               res.json job
           else
-              res.redirect "#{@_locals.baseUrl()}/"
+              res.redirect "#{@_locals and @_locals.baseUrl()}/"
 
 if global.currentNamespace != "/"
   app.namespace global.currentNamespace, deferredApp
