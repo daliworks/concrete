@@ -1,11 +1,14 @@
 express = require 'express'
 stylus = require 'stylus'
+_ = require 'lodash'
 fs = require 'fs'
 path = require 'path'
 runner = require './runner'
 jobs = require './jobs'
 git = require './git'
 require 'express-namespace'
+
+CHANGED_JSON_PATH = '/tmp/_concrete_changed.json'
 
 authorize = (user, pass) ->
     user == git.user and pass == git.pass
@@ -42,6 +45,7 @@ app.configure ->
     app.use express.compiler src: coffeeDir, dest: publicDir, enable: ['coffeescript']
 
     app.use express.logger()
+    app.use express.bodyParser()
     app.use app.router
     app.use global.currentNamespace, express.static __dirname + '/public'
 
@@ -90,6 +94,18 @@ deferredApp = ->
               res.send(200)
 
   app.post '/', (req, res) ->
+      changed = []
+      modKeys = ['added', 'removed', 'modified']
+      try
+        commits = JSON.parse(req.body.payload).commits; 
+      catch e
+
+      if commits
+        _.each commits, (v, k) ->
+          _.each v, (v2, k2) ->
+            changed =  _.union(changed, v2) if _.contains(modKeys, k2)
+        fs.writeFileSync CHANGED_JSON_PATH, JSON.stringify({changed : changed})
+        
       jobs.addJob (job)->
           runner.build()
           if req.xhr

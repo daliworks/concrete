@@ -1,11 +1,13 @@
 # cli colors
 colors = require 'colors'
 git = require './git'
+fs = require 'fs'
 server = require './server'
 exec = require('child_process').exec
 mongo = require 'mongodb'
 jobs = require './jobs'
 
+CHANGED_JSON_PATH = '/tmp/_concrete_changed.json'
 
 parseSequence = (input) ->
   length = input.length
@@ -55,6 +57,7 @@ runNextJob = ->
 runTask = (next)->
     jobs.updateLog jobs.current, "Executing '#{git.runner}'"
     exec git.runner,{maxBuffer: 1024*1024}, (error, stdout, stderr)=>
+        fs.unlinkSync CHANGED_JSON_PATH
         if error?
             updateLog error, true, ->
                 updateLog stdout, true, ->

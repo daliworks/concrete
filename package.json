@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "description": "A minimalistic Continuous Integration server",
   "author": "Ryan Kee <me@ryankee.com> (http://ryankee.com)",
-  "preferGlobal" : true,
+  "preferGlobal": true,
   "keywords": [
     "coffeescript",
     "continuous integration",
@@ -13,9 +13,9 @@
   "bin": {
     "concrete": "./bin/concrete"
   },
-  "directories" : {
-    "bin" : "./bin",
-    "lib" : "./lib"
+  "directories": {
+    "bin": "./bin",
+    "lib": "./lib"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,8 @@
     "stylus": "0.x",
     "coffeekup": "0.3.x",
     "mongodb": "0.9.x",
-    "express-namespace": "*"
+    "express-namespace": "*",
+    "lodash": "~2.3.0"
   },
   "engines": {
     "node": ">=0.4.9"
