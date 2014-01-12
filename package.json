@@ -30,7 +30,8 @@
     "coffeekup": "0.3.x",
     "mongodb": "0.9.x",
     "express-namespace": "*",
-    "lodash": "~2.3.0"
+    "lodash": "~2.3.0",
+    "temp": "~0.6.0"
   },
   "engines": {
     "node": ">=0.4.9"

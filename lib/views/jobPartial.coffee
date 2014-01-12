@@ -8,4 +8,10 @@ li '.job', ->
             div ".outcome#{outcomeClass}", ->
                 if @job.failed then '&#10008;&nbsp;failure' else '&#10003;&nbsp;success'
     div '.job_container', ->
-        @job.log
+        h2 "Build Log"
+        hr ""
+        div -> @job.log
+        br ""
+        h2 "Commit payload"
+        hr ""
+        pre -> JSON.stringify(@job.payload, null, 2)

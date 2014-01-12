@@ -17,6 +17,8 @@ git = module.exports =
         branch: 'concrete.branch'
         user: 'concrete.user'
         pass: 'concrete.pass'
+        failure: 'concrete.failure'
+        success: 'concrete.success'
 
     # init at target directory
     init: (target, callback) ->
@@ -45,6 +47,8 @@ git = module.exports =
             getPass()
             getBranch()
             getRunner()
+            getSuccess()
+            getFailure()
 
     # pull from the git repo
     pull: (next)->
@@ -99,6 +103,28 @@ getRunner = ->
         else
             git.runner = stdout.toString().replace /[\s\r\n]+$/, ''
             git.runner = 'none' if git.runner is ''
+            gitContinue()
+
+# get the concrete success file
+getSuccess = ->
+    exec 'git config --get ' + git.config.success, (error, stdout, stderr)=>
+        if error?
+            console.log "Git.getSuccess: #{error}".red
+            process.exit 1
+        else
+            git.success = stdout.toString().replace /[\s\r\n]+$/, ''
+            git.success = 'none' if git.success is ''
+            gitContinue()
+
+# get the concrete failure file
+getFailure = ->
+    exec 'git config --get ' + git.config.failure, (error, stdout, stderr)=>
+        if error?
+            console.log "Git.getFailure: #{error}".red
+            process.exit 1
+        else
+            git.failure = stdout.toString().replace /[\s\r\n]+$/, ''
+            git.failure = 'none' if git.failure is ''
             gitContinue()
 
 # notify the user of any issue prior to continuing the concrete operation

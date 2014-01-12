@@ -11,13 +11,14 @@ ObjectID = mongo.BSONPure.ObjectID
 
 jobs = module.exports =
     current: null
-    addJob: (next)->
+    addJob: (next, payload)->
         db.collection 'jobs', (error, collection) ->
             job =
                 addedTime: new Date().getTime()
                 log: ''
                 running: no
                 finished: no
+            job.payload = payload if payload
             collection.insert job
             next(job) if next?
 
@@ -62,7 +63,7 @@ jobs = module.exports =
     updateLog: (id, string, next)->
         db.collection 'jobs', (error, collection) ->
             collection.findOne {_id: new ObjectID id}, (error, job) ->
-                console.log "update log for job #{job}, #{string}"
+                console.log "update log for job #{job._id.toString()}, #{string.toString()}"
                 return no if not job?
                 job.log += "#{string} <br />"
                 collection.save(job)

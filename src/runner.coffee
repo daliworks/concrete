@@ -2,12 +2,12 @@
 colors = require 'colors'
 git = require './git'
 fs = require 'fs'
+temp = require 'temp'
+_ = require 'lodash'
 server = require './server'
 exec = require('child_process').exec
 mongo = require 'mongodb'
 jobs = require './jobs'
-
-CHANGED_JSON_PATH = '/tmp/_concrete_changed.json'
 
 parseSequence = (input) ->
   length = input.length
@@ -49,23 +49,34 @@ runner = module.exports =
 runNextJob = ->
     return no if jobs.current?
     jobs.next ->
-        git.pull ->
-            runTask (success)->
-                jobs.currentComplete success, ->
-                    runNextJob()
+        runTask (success)->
+            jobs.currentComplete success, ->
+                runNextJob()
 
 runTask = (next)->
-    jobs.updateLog jobs.current, "Executing '#{git.runner}'"
-    exec git.runner,{maxBuffer: 1024*1024}, (error, stdout, stderr)=>
-        fs.unlinkSync CHANGED_JSON_PATH
-        if error?
-            updateLog error, true, ->
-                updateLog stdout, true, ->
-                    updateLog stderr, true, ->
-                        runFile git.failure, next, no
-        else
-            updateLog stdout, true, ->
-                runFile git.success, next, yes
+    jobs.updateLog jobs.current, "Executing '#{git.runner}'", ->
+        jobs.get jobs.current,(job)->
+            runnerCmd = git.runner
+            commits = job.payload.commits if job.payload
+            changed = []
+            if commits
+                modKeys = ['added', 'removed', 'modified']
+                _.each commits, (v, k) ->
+                    _.each v, (v2, k2) ->
+                        changed =  _.union(changed, v2) if _.contains(modKeys, k2)
+                changedPath = temp.path({dir: '/tmp', suffix: '.json'})
+                fs.writeFileSync changedPath, JSON.stringify({changed : changed})
+                runnerCmd += ' ' + changedPath
+
+            exec runnerCmd, {maxBuffer: 1024*1024}, (error, stdout, stderr)=>
+                if error?
+                    updateLog error, true, ->
+                        updateLog stdout, true, ->
+                            updateLog stderr, true, ->
+                                runFile git.failure, next, no
+                else
+                    updateLog stdout, true, ->
+                        runFile git.success, next, yes
 
 runFile = (file, next, args=null) ->
     jobs.updateLog jobs.current, "Executing #{file}", ->

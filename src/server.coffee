@@ -94,26 +94,19 @@ deferredApp = ->
               res.send(200)
 
   app.post '/', (req, res) ->
-      changed = []
-      modKeys = ['added', 'removed', 'modified']
       try
-        commits = JSON.parse(req.body.payload).commits; 
+        payload = JSON.parse(req.body.payload) if req.body.payload
       catch e
-
-      if commits
-        _.each commits, (v, k) ->
-          _.each v, (v2, k2) ->
-            changed =  _.union(changed, v2) if _.contains(modKeys, k2)
-        fs.writeFileSync CHANGED_JSON_PATH, JSON.stringify({changed : changed})
         
-      jobs.addJob (job)->
-          runner.build()
-          if req.xhr
-              console.log job
-              res.json job
-          else
-              res.redirect "#{@_locals and @_locals.baseUrl()}/"
-
+      jobs.addJob(
+          (job)->
+              runner.build()
+              if req.xhr
+                  console.log job
+                  res.json job
+              else
+                  res.redirect "#{@_locals and @_locals.baseUrl()}/"
+          payload)
 if global.currentNamespace != "/"
   app.namespace global.currentNamespace, deferredApp
 else
