@@ -44,7 +44,7 @@ app.configure ->
     publicDir = __dirname + @_locals.baseUrl() + '/public'
     app.use express.compiler src: coffeeDir, dest: publicDir, enable: ['coffeescript']
 
-    app.use express.logger()
+    app.use express.logger('short')
     app.use express.bodyParser()
     app.use app.router
     app.use global.currentNamespace, express.static __dirname + '/public'
