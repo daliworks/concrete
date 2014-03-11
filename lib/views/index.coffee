@@ -16,6 +16,9 @@ html ->
                 h1 'CONCRETE'
                 h2 '.project', -> @project
                 nav ->
+                    if @logFile
+                        a target: '_blank', href: "#{@logFile}", -> 
+                            'Latest detail log'
                     form method: 'post', action: @baseUrl(), ->
                         button '.build', -> 'Build'
 

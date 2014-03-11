@@ -47,6 +47,10 @@ app.configure ->
     app.use express.logger('short')
     app.use express.bodyParser()
     app.use app.router
+
+    if process.env.LOG_FILE
+      app.use '/log', express.static path.dirname(process.env.LOG_FILE)
+
     app.use global.currentNamespace, express.static __dirname + '/public'
 
 app.configure 'development', ->
@@ -61,6 +65,7 @@ deferredApp = ->
           res.render 'index',
               project: path.basename process.cwd()
               jobs: jobs
+              logFile: ('log/' + path.basename(process.env.LOG_FILE)) if process.env.LOG_FILE
 
   app.get '/jobs', (req, res) ->
       jobs.getAll (jobs)->
