@@ -21,9 +21,6 @@ html ->
                             'Latest detail log'
                     form method: 'post', action: @baseUrl(), ->
                         button '.build', -> 'Build'
-                    if @mongoDB
-                        span '', -> '(concrete db @ ' + @mongoDB + ')'
-
 
         div '#content', ->
             ul '.jobs', ->

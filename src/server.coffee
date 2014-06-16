@@ -66,7 +66,6 @@ deferredApp = ->
               project: path.basename process.cwd()
               jobs: jobs
               logFile: ('log/' + path.basename(process.env.LOG_FILE)) if process.env.LOG_FILE
-              mongoDB: process.env.CONCRETE_MONGODB
 
   app.get '/jobs', (req, res) ->
       jobs.getAll (jobs)->
